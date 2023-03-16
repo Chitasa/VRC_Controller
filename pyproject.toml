@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "vrc_controller"
+version = "0.0.1"
+authors = [
+    { name = "Chitasa" },
+]
+description = "A wrapper for VR Chat's OSC bindings and audio support"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'event-bus==1.0.2',
+    'numpy==1.24.2',
+    'scipy==1.10.1',
+    'sounddevice==0.4.6',
+    'soundfile==0.12.1',
+    'python-osc==1.8.1',
+    'SpeechRecognition==3.10.0',
+]
+[project.urls]
+"Homepage" = "https://github.com/Chitasa/VRC_Controller"
+"Bug Tracker" = "https://github.com/Chitasa/VRC_Controller/issues"
