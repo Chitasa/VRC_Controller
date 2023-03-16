@@ -1,8 +1,8 @@
-import constants as c
+from .constants import SILENCE_THRESHOLD, MAX_SILENCE, MAX_AUDIO_LENGTH
 import io
 import numpy as np
 from scipy.io.wavfile import write
-import singletons
+from .singletons import bus
 import sounddevice as sd
 import soundfile as sf
 import speech_recognition as sr
@@ -72,7 +72,7 @@ class AudioListener:
         if self.running:
             self.running = False
             if (data := np.concatenate(self.temp_sounds[:self.last_talked_index])).size:
-                singletons.bus.emit("audio_raw", data, threads=True)
+                bus.emit("audio_raw", data, threads=True)
 
     def callback(self, indata: np.array, frames: int, _, __):
         """
@@ -82,7 +82,7 @@ class AudioListener:
         rms = np.sqrt(np.mean(indata ** 2))  # Using Root Mean Squared to check for silence
 
         if not self.running:  # Start recording if not recording
-            if rms > c.SILENCE_THRESHOLD:
+            if rms > SILENCE_THRESHOLD:
                 self.start_recording()
             else:
                 return
@@ -90,12 +90,12 @@ class AudioListener:
         self.frames_passed += frames
         self.temp_sounds.append(indata.copy())
 
-        if rms > c.SILENCE_THRESHOLD:
+        if rms > SILENCE_THRESHOLD:
             self.last_talked = self.frames_passed
             self.last_talked_index = len(self.temp_sounds)  # Used to cut off silent bits
 
-        if self.frames_passed > c.MAX_AUDIO_LENGTH * 22050 or \
-                (self.frames_passed - self.last_talked) > c.MAX_SILENCE * 22050:
+        if self.frames_passed > MAX_AUDIO_LENGTH * 22050 or \
+                (self.frames_passed - self.last_talked) > MAX_SILENCE * 22050:
             self.end_recording()
 
 
@@ -123,7 +123,7 @@ def use_default_dictation():
     """
     recognizer = sr.Recognizer()
 
-    @singletons.bus.on("audio_raw")
+    @bus.on("audio_raw")
     def audio_raw(data: np.array):
         wav_bytes = io.BytesIO()
         write(wav_bytes, 22050, data.astype(np.int32))
@@ -132,6 +132,6 @@ def use_default_dictation():
 
             try:
                 text = recognizer.recognize_google(audio)
-                singletons.bus.emit("speech_heard", text)
+                bus.emit("speech_heard", text)
             except sr.UnknownValueError:
                 print("Could not fetch audio data")

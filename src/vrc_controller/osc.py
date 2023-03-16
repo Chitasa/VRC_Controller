@@ -1,6 +1,6 @@
 from pythonosc.dispatcher import Dispatcher
 from pythonosc import osc_server, udp_client
-import singletons
+from .singletons import bus
 from threading import Thread
 
 
@@ -20,7 +20,7 @@ class BotController:
         Dispatches avatar events to the bus, contains `name` for which controller sent the event
         """
         event = path.split("/")[-1]
-        singletons.bus.emit(event, self.name, value)
+        bus.emit(event, self.name, value)
 
     def _send(self, address, data):
         """

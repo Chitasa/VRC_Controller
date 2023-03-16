@@ -1,6 +1,6 @@
-from singletons import bus
-from sounds import Audio, use_default_dictation
-from osc import BotController
+from .singletons import bus
+from .sounds import Audio, use_default_dictation
+from .osc import BotController
 import time
 
 
